@@ -23,7 +23,7 @@ export class HashMap {
 
         for (const bucket of oldBuckets) {
             if (bucket) {
-                for (const [key, value] of bucket) {
+                for (const { key, value } of bucket) {
                     this.set(key, value);
                 }
             }
@@ -43,15 +43,15 @@ export class HashMap {
         }
 
         // Check if key already exists inside this bucket
-        for (let pair of this.buckets[index]) {
-            if (pair[0] === key) {
-                pair[1] = value;
+        for (let entry of this.buckets[index]) {
+            if (entry.key === key) {
+                entry.value = value;
                 return;
             }
         }
 
         // Key not found then insert new pair
-        this.buckets[index].push([key, value]);
+        this.buckets[index].push({ key, value });
         this.size++;
     }
     // takes one argument as a key and returns the value that is assigned to this key. If a key is not found, return null
@@ -60,8 +60,8 @@ export class HashMap {
         const bucket = this.buckets[index];
         if (!bucket) return null;
 
-        for (let [k, v] of bucket) {
-            if (k === key) return v;
+        for (let entry of bucket) {
+            if (entry.key === key) return entry.value;
         }
         return null;
     }
@@ -71,7 +71,7 @@ export class HashMap {
         const bucket = this.buckets[index];
         if (!bucket) return false;
 
-        return bucket.some(([k]) => k === key);
+        return bucket.some(entry => entry.key === key);
     }
     // takes a key as an argument. If the given key is in the hash map, it should remove the entry with that key and return true. If the key isn’t in the hash map, it should return false
     remove(key) {
@@ -80,7 +80,7 @@ export class HashMap {
         if (!bucket) return false;
 
         for (let i = 0; i < bucket.length; i++) {
-            if (bucket[i][0] === key) {
+            if (bucket[i].key === key) {
                 bucket.splice(i, 1);
                 this.size--;
                 if (bucket.length === 0) this.buckets[index] = undefined;
@@ -104,7 +104,7 @@ export class HashMap {
         const keys = [];
         for (const bucket of this.buckets) {
             if (bucket) {
-                for (const [k] of bucket) keys.push(k);
+                for (const entry of bucket) keys.push(entry.key);
             }
         }
         return keys;
@@ -114,7 +114,7 @@ export class HashMap {
         const values = [];
         for (const bucket of this.buckets) {
             if (bucket) {
-                for (const [, v] of bucket) values.push(v);
+                for (const entry of bucket) values.push(entry.value);
             }
         }
         return values;
@@ -124,7 +124,7 @@ export class HashMap {
         const all = [];
         for (const bucket of this.buckets) {
             if (bucket) {
-                for (const pair of bucket) all.push([...pair]);
+                for (const entry of bucket) all.push([entry.key, entry.value]);
             }
         }
         return all;
